@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mô phỏng Cổng Đăng Ký Học Phần VNU - Test Auto DKMH</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13px;
+      background: #fafafa;
+      color: #333;
+      display: flex;
+      min-height: 100vh;
+    }
+    .page-sidebar {
+      width: 265px;
+      background: #f5f5f5;
+      border-right: 1px solid #ddd;
+      flex-shrink: 0;
+    }
+    .nav-item {
+      padding: 12px 14px;
+      border-bottom: 1px solid #e5e5e5;
+      color: #333;
+      font-weight: 500;
+    }
+    .nav-item.active {
+      background: #e9e9e9;
+      font-weight: 700;
+    }
+    .page-content {
+      flex: 1;
+      padding: 16px 22px;
+    }
+    .page-title {
+      font-size: 22px;
+      font-weight: 600;
+      margin: 0 0 14px 0;
+      color: #222;
+    }
+    .section-banner {
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .banner-green {
+      background: #63b567;
+    }
+    .banner-blue {
+      background: #4aa3df;
+      margin-top: 22px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #f0f0f0;
+      font-weight: 700;
+    }
+    tr.course-highlight {
+      background: #ffffb8;
+    }
+    tr.registered-row {
+      background: #f9d6d5;
+    }
+    .col-check {
+      width: 44px;
+      text-align: center;
+    }
+    .actions-bar {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+    }
+    .btn-confirm-registration {
+      background: #5cb85c;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-confirm-registration:hover {
+      background: #4cae4c;
+    }
+    .toast-msg {
+      font-weight: 600;
+      color: #2b542c;
+    }
+  </style>
+</head>
+<body>
+  <aside class="page-sidebar">
+    <div class="nav-item">Trang chủ</div>
+    <div class="nav-item">Đăng ký môn học</div>
+    <div class="nav-item active">&#9656; Đăng ký học ngành 1</div>
+    <div class="nav-item">In đăng ký học</div>
+    <!-- Bảng điều khiển Tool Auto DKMH VNU v1.3 sẽ tự động chèn vào đây -->
+  </aside>
+
+  <main class="page-content">
+    <h1 class="page-title">Đăng ký học ngành 1 - Học kỳ 1 năm học 2019-2020 - [5]</h1>
+
+    <div class="section-banner banner-green">
+      Đăng ký học ngành 1 - Học kỳ 1 năm học 2019-2020 - [5]
+    </div>
+
+    <div id="divDanhSachMonHoc">
+      <table class="table-course-list">
+        <thead>
+          <tr>
+            <th class="col-check">Chọn</th>
+            <th>Tên môn học</th>
+            <th>Số TC</th>
+            <th>Bắt buộc</th>
+            <th>Mã lớp học phần</th>
+            <th>Tổng SV</th>
+            <th>Đã ĐK</th>
+            <th>Giảng viên</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="course-highlight">
+            <td class="col-check">
+              <input type="checkbox" class="chk-reg" data-rowindex="158" />
+            </td>
+            <td>Nguyên lý marketing</td>
+            <td>3</td>
+            <td></td>
+            <td>BSA2002 5</td>
+            <td>50</td>
+            <td>49</td>
+            <td>TS Đào Tùng</td>
+          </tr>
+          <tr>
+            <td class="col-check">
+              <input type="checkbox" class="chk-reg" data-rowindex="159" />
+            </td>
+            <td>Nguyên lý marketing</td>
+            <td>3</td>
+            <td></td>
+            <td>BSA2002 6</td>
+            <td>50</td>
+            <td>34</td>
+            <td>ThS Đặng Hồng Vân</td>
+          </tr>
+          <tr>
+            <td class="col-check">
+              <input type="checkbox" class="chk-reg" data-rowindex="160" />
+            </td>
+            <td>Nguyên lý marketing</td>
+            <td>3</td>
+            <td></td>
+            <td>BSA2002 7</td>
+            <td>50</td>
+            <td>42</td>
+            <td>ThS Nguyễn Phương Anh</td>
+          </tr>
+          <tr>
+            <td class="col-check">
+              <input type="checkbox" class="chk-reg" data-rowindex="161" />
+            </td>
+            <td>Nguyên lý marketing</td>
+            <td>3</td>
+            <td></td>
+            <td>BSA2002 8</td>
+            <td>50</td>
+            <td>30</td>
+            <td>ThS Nguyễn Phương Anh</td>
+          </tr>
+          <tr class="course-highlight">
+            <td class="col-check">
+              <input type="checkbox" class="chk-reg" data-rowindex="162" />
+            </td>
+            <td>Nguyên lý marketing</td>
+            <td>3</td>
+            <td></td>
+            <td>BSA2002 9</td>
+            <td>50</td>
+            <td>35</td>
+            <td>TS Đào Tùng</td>
+          </tr>
+          <tr>
+            <td class="col-check">
+              <input type="checkbox" class="chk-reg" data-rowindex="163" />
+            </td>
+            <td>Nguyên lý quản trị kinh doanh</td>
+            <td>3</td>
+            <td>3</td>
+            <td>BSA2103 1</td>
+            <td>100</td>
+            <td>68</td>
+            <td>TS Lưu Hữu Văn</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="actions-bar">
+      <span id="portal-toast" class="toast-msg">
+        Thử nhập <code>160</code> hoặc <code>BSA2002 6</code> hay <code>BSA2103 1</code> vào ô bên trái rồi bấm "Đăng Ký Nhanh"!
+      </span>
+      <button type="button" id="btnGhiNhan" class="btn-confirm-registration">
+        Ghi nhận
+      </button>
+    </div>
+
+    <div class="section-banner banner-blue">
+      Danh sách môn học đã đăng ký hoặc đã chọn
+    </div>
+    <div id="divDSDK">
+      <table>
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Tên môn học</th>
+            <th>Số TC</th>
+            <th>Mã lớp học phần</th>
+            <th>Giảng viên</th>
+            <th>Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody id="registered-tbody">
+          <tr class="registered-row">
+            <td>1</td>
+            <td>Bóng đá</td>
+            <td>1</td>
+            <td>PES1025 19</td>
+            <td>Trung tâm GDTC</td>
+            <td>Đã ghi nhận</td>
+          </tr>
+          <tr class="registered-row">
+            <td>2</td>
+            <td>Bóng rổ</td>
+            <td>1</td>
+            <td>PES1020 42</td>
+            <td>Trung tâm GDTC</td>
+            <td>Đã ghi nhận</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    // Logic mô phỏng nút "Ghi nhận" của cổng ĐKMH
+    document.getElementById("btnGhiNhan").addEventListener("click", function () {
+      const checkedBoxes = Array.from(
+        document.querySelectorAll("#divDanhSachMonHoc input.chk-reg:checked")
+      );
+      const regTbody = document.getElementById("registered-tbody");
+      const toast = document.getElementById("portal-toast");
+
+      if (checkedBoxes.length === 0) {
+        toast.textContent = "Chưa có môn học nào được tích chọn để Ghi nhận.";
+        return;
+      }
+
+      let addedCount = 0;
+      checkedBoxes.forEach((cb) => {
+        const tr = cb.closest("tr");
+        const cells = tr.querySelectorAll("td");
+        const courseName = cells[1].textContent.trim();
+        const credits = cells[2].textContent.trim();
+        const classCode = cells[4].textContent.trim();
+        const lecturer = cells[7].textContent.trim();
+
+        const exists = Array.from(regTbody.querySelectorAll("tr")).some(
+          (r) => r.children[3] && r.children[3].textContent.trim() === classCode
+        );
+        if (!exists) {
+          const stt = regTbody.querySelectorAll("tr").length + 1;
+          const newRow = document.createElement("tr");
+          newRow.className = "registered-row";
+          newRow.innerHTML = `
+            <td>${stt}</td>
+            <td>${courseName}</td>
+            <td>${credits}</td>
+            <td>${classCode}</td>
+            <td>${lecturer}</td>
+            <td>Vừa ghi nhận (${new Date().toLocaleTimeString("vi-VN")})</td>
+          `;
+          regTbody.appendChild(newRow);
+          addedCount++;
+        }
+      });
+
+      toast.textContent = `Hệ thống ĐKMH: Đã ghi nhận thành công ${addedCount} môn học mới!`;
+    });
+  </script>
+  <script src="content.js"></script>
+</body>
+</html>

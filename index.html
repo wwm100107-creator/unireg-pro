@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniReg Pro — Web Tool Xếp TKB & Đăng Ký Học Phần Đa Trường</title>
+  <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-group">
+        <div class="brand-logo">🎓</div>
+        <div>
+          <h1 class="brand-title">UniReg Pro — Công Cụ Đăng Ký Học Phần Đa Trường</h1>
+          <p class="brand-subtitle">
+            Xếp Thời Khóa Biểu chống trùng lịch • Tự nhận diện cổng trường &amp; Click chọn phần tử • Xuất Bookmarklet / Extension Auto Canh Slot
+          </p>
+        </div>
+      </div>
+      <div class="header-stats">
+        <span class="stat-pill" id="stat-school">Trường: Tự động nhận diện (Đa trường)</span>
+        <span class="stat-pill" id="stat-courses">Đã chọn: 0 môn (0 TC)</span>
+        <span class="stat-pill" id="stat-conflicts">Trạng thái: Không trùng lịch</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="nav-tabs-bar">
+    <div class="nav-tabs-inner">
+      <button type="button" class="tab-btn active" data-tab="tab-timetable">
+        📅 1. Xếp TKB &amp; Kiểm Tra Trùng Lịch
+      </button>
+      <button type="button" class="tab-btn" data-tab="tab-profiles">
+        🏫 2. Cấu Hình Trường &amp; Chia Sẻ Profile
+      </button>
+      <button type="button" class="tab-btn" data-tab="tab-generator">
+        🚀 3. Tạo Bookmarklet / Script Auto ĐK
+      </button>
+      <button type="button" class="tab-btn" data-tab="tab-sandbox">
+        🧪 4. Phòng Thử Nghiệm Đa Trường (Visual Picker)
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="app-container">
+    <!-- TAB 1: TIMETABLE PLANNER & CONFLICT CHECKER -->
+    <section id="tab-timetable" class="tab-pane active">
+      <div class="grid-2col">
+        <!-- Left Column: Add Course & Quick Import -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">➕ Thêm Lớp Học Phần Cần Đăng Ký</h3>
+              <button type="button" id="btn-load-sample" class="btn btn-outline btn-sm">
+                Nạp dữ liệu mẫu
+              </button>
+            </div>
+            <form id="form-add-course">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inp-class-code">Mã lớp học phần / Mã ẩn *</label>
+                  <input type="text" id="inp-class-code" placeholder="VD: BSA2002 6 hoặc IT3080_01" required />
+                </div>
+                <div class="form-group">
+                  <label for="inp-credits">Số tín chỉ *</label>
+                  <input type="number" id="inp-credits" min="1" max="15" value="3" required />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="inp-course-name">Tên học phần *</label>
+                <input type="text" id="inp-course-name" placeholder="VD: Nguyên lý Marketing / Cấu trúc dữ liệu" required />
+              </div>
+
+              <div class="form-row-3">
+                <div class="form-group">
+                  <label for="inp-day">Thứ trong tuần</label>
+                  <select id="inp-day">
+                    <option value="2">Thứ 2</option>
+                    <option value="3">Thứ 3</option>
+                    <option value="4">Thứ 4</option>
+                    <option value="5">Thứ 5</option>
+                    <option value="6">Thứ 6</option>
+                    <option value="7">Thứ 7</option>
+                    <option value="8">Chủ nhật</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="inp-start-period">Từ tiết</label>
+                  <select id="inp-start-period">
+                    <option value="1">Tiết 1</option>
+                    <option value="2">Tiết 2</option>
+                    <option value="3">Tiết 3</option>
+                    <option value="4">Tiết 4</option>
+                    <option value="5">Tiết 5</option>
+                    <option value="6">Tiết 6</option>
+                    <option value="7">Tiết 7</option>
+                    <option value="8">Tiết 8</option>
+                    <option value="9">Tiết 9</option>
+                    <option value="10">Tiết 10</option>
+                    <option value="11">Tiết 11</option>
+                    <option value="12">Tiết 12</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="inp-end-period">Đến tiết</label>
+                  <select id="inp-end-period">
+                    <option value="1">Tiết 1</option>
+                    <option value="2">Tiết 2</option>
+                    <option value="3" selected>Tiết 3</option>
+                    <option value="4">Tiết 4</option>
+                    <option value="5">Tiết 5</option>
+                    <option value="6">Tiết 6</option>
+                    <option value="7">Tiết 7</option>
+                    <option value="8">Tiết 8</option>
+                    <option value="9">Tiết 9</option>
+                    <option value="10">Tiết 10</option>
+                    <option value="11">Tiết 11</option>
+                    <option value="12">Tiết 12</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inp-room">Phòng học / Cơ sở</label>
+                  <input type="text" id="inp-room" placeholder="VD: 304-G2 / P.B201" />
+                </div>
+                <div class="form-group">
+                  <label for="inp-lecturer">Giảng viên</label>
+                  <input type="text" id="inp-lecturer" placeholder="VD: TS. Nguyễn Văn A" />
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-block">
+                ➕ Thêm vào danh sách &amp; Thời khóa biểu
+              </button>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">⚡ Nhập Nhanh Danh Sách Mã Lớp</h3>
+            </div>
+            <div class="form-group">
+              <label for="inp-bulk-codes">
+                Dán mỗi dòng 1 mã lớp (hoặc định dạng: <code>Mã lớp | Tên môn | TC | Thứ | Tiết đầu-Tiết cuối</code>)
+              </label>
+              <textarea
+                id="inp-bulk-codes"
+                rows="4"
+                placeholder="BSA2002 6 | Nguyên lý Marketing | 3 | 2 | 1-3&#10;INT2204 1 | Lập trình hướng đối tượng | 3 | 4 | 4-6&#10;PES1025 19"
+              ></textarea>
+            </div>
+            <button type="button" id="btn-bulk-import" class="btn btn-outline btn-block">
+              📥 Nhập hàng loạt vào danh sách
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Column: Conflict Alert, Visual Timetable & Course List -->
+        <div>
+          <div id="conflict-alert-box" class="conflict-banner ok">
+            ✅ <strong>Hợp lệ:</strong> Chưa phát hiện môn học nào bị trùng lịch.
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">🗓️ Bảng Thời Khóa Biểu Trực Quan (Tiết 1 → Tiết 12)</h3>
+              <div>
+                <button type="button" id="btn-clear-courses" class="btn btn-outline btn-sm">
+                  🗑️ Xóa tất cả môn
+                </button>
+              </div>
+            </div>
+            <div class="timetable-wrapper">
+              <table class="timetable-grid" id="timetable-grid">
+                <thead>
+                  <tr>
+                    <th class="period-col">Tiết</th>
+                    <th>Thứ 2</th>
+                    <th>Thứ 3</th>
+                    <th>Thứ 4</th>
+                    <th>Thứ 5</th>
+                    <th>Thứ 6</th>
+                    <th>Thứ 7</th>
+                    <th>Chủ nhật</th>
+                  </tr>
+                </thead>
+                <tbody id="timetable-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">📋 Danh Sách Học Phần Sẽ Đưa Vào Auto Đăng Ký</h3>
+              <button type="button" class="btn btn-primary btn-sm" id="btn-go-generator">
+                Chuyển sang tạo Script Auto ĐK →
+              </button>
+            </div>
+            <div class="timetable-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Bật Auto</th>
+                    <th>Mã lớp / Mã số</th>
+                    <th>Tên học phần</th>
+                    <th>TC</th>
+                    <th>Lịch học</th>
+                    <th>Phòng / GV</th>
+                    <th>Trạng thái</th>
+                    <th>Xóa</th>
+                  </tr>
+                </thead>
+                <tbody id="course-list-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: UNIVERSITY PROFILES & SELECTOR CONFIG -->
+    <section id="tab-profiles" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">🏫 Chọn Hệ Thống Cổng Đăng Ký Học Phần (Preset Đa Trường)</h3>
+          <span class="badge badge-blue">Hỗ trợ mọi trường ĐH/CĐ tại Việt Nam</span>
+        </div>
+        <p style="margin-top: 0; color: var(--text-secondary);">
+          Chọn hệ thống tương ứng với trường của bạn hoặc chọn <strong>Tự động nhận diện thông minh (Smart Auto-Detect)</strong>. Bạn cũng có thể tùy chỉnh bộ chọn (CSS Selector) bên dưới và lưu thành Profile riêng để chia sẻ cho bạn bè cùng trường.
+        </p>
+        <div class="preset-grid" id="preset-grid"></div>
+      </div>
+
+      <div class="grid-2col">
+        <!-- Form chỉnh sửa & Lưu Profile -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">⚙️ Cấu Hình Chi Tiết Profile Trường Đang Chọn</h3>
+          </div>
+          <div class="form-group">
+            <label for="prof-name">Tên Profile (Trường / Học kỳ)</label>
+            <input type="text" id="prof-name" placeholder="VD: ĐH Bách Khoa - HK1 2026-2027" />
+          </div>
+          <div class="form-group">
+            <label for="prof-domain">Tên miền cổng ĐKMH (Tùy chọn, để nhận diện tự động)</label>
+            <input type="text" id="prof-domain" placeholder="VD: dangkyhoc.vnu.edu.vn hoặc dkmh.hcmuaf.edu.vn" />
+          </div>
+          <div class="form-group">
+            <label for="prof-row-selector">CSS Selector dòng môn học (Course Row)</label>
+            <input type="text" id="prof-row-selector" placeholder="VD: table tbody tr" />
+          </div>
+          <div class="form-group">
+            <label for="prof-action-selector">CSS Selector ô tick / nút chọn trên dòng (Checkbox / Button)</label>
+            <input type="text" id="prof-action-selector" placeholder="VD: input[type='checkbox'], button.btn-reg" />
+          </div>
+          <div class="form-group">
+            <label for="prof-search-selector">CSS Selector ô nhập mã môn nhanh (Nếu trường đăng ký bằng ô text)</label>
+            <input type="text" id="prof-search-selector" placeholder="Để trống nếu tick trực tiếp trên bảng" />
+          </div>
+          <div class="form-group">
+            <label for="prof-submit-selector">CSS Selector nút Lưu / Ghi nhận đăng ký</label>
+            <input type="text" id="prof-submit-selector" placeholder="VD: #btnGhiNhan, #btnLuu, button.btn-confirm" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="prof-interval">Chu kỳ Auto ĐK (giây)</label>
+              <input type="number" id="prof-interval" min="0.5" step="0.5" value="2.5" />
+            </div>
+            <div class="form-group">
+              <label for="prof-auto-submit">Tự động bấm nút Lưu / Ghi nhận</label>
+              <select id="prof-auto-submit">
+                <option value="true">Có (Chọn môn xong bấm Lưu ngay)</option>
+                <option value="false">Không (Chỉ tick chọn môn)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 8px;">
+            <button type="button" id="btn-save-profile" class="btn btn-primary" style="flex: 1;">
+              💾 Lưu vào danh sách Profile của tôi
+            </button>
+          </div>
+        </div>
+
+        <!-- Danh sách Profile đã lưu & Chia sẻ JSON -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">🗂️ Danh Sách Profile Đã Lưu (Chia Sẻ Cùng Trường)</h3>
+            </div>
+            <div class="timetable-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Tên Profile</th>
+                    <th>Domain / Hệ thống</th>
+                    <th>Chu kỳ</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="saved-profiles-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">🔗 Xuất / Nhập Gói Cấu Hình (Profile + Danh Sách Môn)</h3>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" id="btn-export-bundle" class="btn btn-outline btn-sm">
+                  📤 Tạo mã JSON chia sẻ
+                </button>
+                <button type="button" id="btn-import-bundle" class="btn btn-primary btn-sm">
+                  📥 Nhập từ JSON
+                </button>
+              </div>
+            </div>
+            <p style="margin-top: 0; font-size: 12.5px; color: var(--text-secondary);">
+              Bạn có thể copy đoạn JSON dưới đây gửi cho bạn bè cùng lớp/cùng trường để họ nạp cả cấu hình bộ chọn của trường lẫn danh sách môn học chỉ trong 1 cú click.
+            </p>
+            <textarea
+              id="bundle-json-box"
+              rows="6"
+              placeholder="Bấm 'Tạo mã JSON chia sẻ' để xuất hoặc dán mã JSON của bạn bè vào đây rồi bấm 'Nhập từ JSON'..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: BOOKMARKLET / USERSCRIPT GENERATOR -->
+    <section id="tab-generator" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">🚀 Sử Dụng Trên Cổng Đăng Ký Môn Học Của Mọi Trường</h3>
+          <span class="badge badge-green">Tích hợp sẵn danh sách môn &amp; Visual Picker</span>
+        </div>
+
+        <div class="bookmarklet-zone">
+          <h3 style="margin: 0 0 6px 0;">Cách 1 (Nhanh nhất - Mọi trình duyệt): Kéo thả nút Bookmarklet</h3>
+          <p style="margin: 0 0 12px 0; color: var(--text-secondary);">
+            Kéo nút màu xanh bên dưới thả lên <strong>Thanh dấu trang (Bookmarks Bar - Ctrl+Shift+B)</strong> của trình duyệt. Khi bạn đăng nhập vào trang ĐKMH của bất kỳ trường nào, chỉ cần bấm vào dấu trang đó là bảng điều khiển <strong>UniReg Auto Đa Trường</strong> sẽ xuất hiện ngay trên trang!
+          </p>
+          <a id="bookmarklet-link" href="#" class="bookmarklet-drag-btn">
+            ⚡ UniReg Auto ĐK (Đa Trường)
+          </a>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">
+            (Đã nhúng sẵn <strong id="gen-course-count">0</strong> mã môn từ Thời khóa biểu và Profile <strong id="gen-profile-name">Tự động nhận diện</strong>)
+          </div>
+        </div>
+
+        <div class="grid-2col">
+          <div>
+            <h4 style="margin: 0 0 8px 0;">Cách 2: Copy mã chạy trực tiếp trong Console (F12) hoặc Tampermonkey</h4>
+            <p style="margin: 0 0 10px 0; font-size: 13px; color: var(--text-secondary);">
+              Đoạn mã độc lập dưới đây đã bao gồm đầy đủ: danh sách môn học bạn đã xếp, bộ nhận diện đa trường, công cụ <strong>🎯 Click chọn phần tử (Visual Picker)</strong> và chế độ <strong>Auto Canh Slot</strong>.
+            </p>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+              <button type="button" id="btn-copy-script" class="btn btn-primary">
+                📋 Copy toàn bộ Script
+              </button>
+              <button type="button" id="btn-download-userscript" class="btn btn-success">
+                ⬇️ Tải file .user.js (Tampermonkey)
+              </button>
+            </div>
+          </div>
+          <div>
+            <h4 style="margin: 0 0 8px 0;">Cách 3: Cài đặt thư mục Chrome Extension Đa Trường</h4>
+            <p style="margin: 0; font-size: 13px; color: var(--text-secondary);">
+              Thư mục <code>extension/</code> trong dự án cũng đã được nâng cấp thành bản <strong>Universal Extension v2.0</strong> hỗ trợ mọi trường. Mở <code>chrome://extensions</code> → Bật <em>Developer mode</em> → <em>Load unpacked</em> → Chọn thư mục <code>extension/</code>.
+            </p>
+          </div>
+        </div>
+
+        <textarea id="generated-script-box" class="code-block" readonly></textarea>
+      </div>
+    </section>
+
+    <!-- TAB 4: MULTI-UNIVERSITY LIVE SANDBOX & VISUAL ELEMENT PICKER -->
+    <section id="tab-sandbox" class="tab-pane">
+      <div class="card" style="margin-bottom: 16px;">
+        <div class="card-header" style="margin-bottom: 8px; padding-bottom: 8px;">
+          <div>
+            <h3 class="card-title">🧪 Phòng Thử Nghiệm Đa Trường (Thử Ngay Visual Picker &amp; Auto ĐK)</h3>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <label for="sandbox-portal-select" style="margin: 0;">Chọn giao diện cổng trường giả lập:</label>
+            <select id="sandbox-portal-select" style="width: auto; font-weight: 600;">
+              <option value="vnu">1. Cổng ĐHQGHN (VNU Portal - Checkbox + Mã ẩn)</option>
+              <option value="edusoft">2. Cổng Edusoft.Net (HUTECH, PTIT, SGU, TDTU...)</option>
+              <option value="custom">3. Cổng Trường Đặc Thù (Dùng nút bấm riêng - Test Visual Picker 🎯)</option>
+            </select>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; color: var(--text-secondary);">
+          Tại đây bạn có thể trải nghiệm cách <strong>Bảng điều khiển UniReg Đa Trường</strong> hoạt động thực tế trên các hệ thống web trường khác nhau. Hãy thử bấm nút <strong>🎯 Click chọn dòng/nút</strong> ở khung bên trái rồi click vào bảng môn học bên phải để xem công cụ tự động học cấu trúc trang web của trường!
+        </p>
+      </div>
+
+      <div class="sandbox-layout">
+        <!-- Left: Embedded Universal Control Widget -->
+        <div class="card" style="border: 2px solid var(--primary);">
+          <div class="card-header" style="background: var(--primary-soft); margin: -20px -20px 14px -20px; padding: 12px 16px; border-radius: 10px 10px 0 0;">
+            <h3 class="card-title" style="color: #1e3a8a; font-size: 14.5px;">
+              ⚡ Bảng Điều Khiển UniReg Đa Trường
+            </h3>
+            <span class="badge badge-blue">Live Widget</span>
+          </div>
+
+          <div class="form-group">
+            <label for="sb-codes-input">Danh sách mã lớp / mã môn cần đăng ký (mỗi dòng 1 mã):</label>
+            <textarea id="sb-codes-input" rows="4"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>🎯 Công cụ Visual Picker (Dành cho trường có giao diện lạ):</label>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <button type="button" id="btn-pick-action" class="btn btn-outline btn-sm" style="flex: 1;">
+                🎯 1. Click chọn Ô/Nút ĐK
+              </button>
+              <button type="button" id="btn-pick-submit" class="btn btn-outline btn-sm" style="flex: 1;">
+                🎯 2. Click chọn Nút Lưu
+              </button>
+            </div>
+            <div id="picker-hint" style="font-size: 11.5px; color: var(--warning); margin-top: 4px; display: none;">
+              👉 Hãy di chuột sang bảng môn học bên phải và click vào phần tử tương ứng!
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="sb-action-sel">Selector Ô/Nút chọn:</label>
+              <input type="text" id="sb-action-sel" value="input[type='checkbox'], .btn-select-course" />
+            </div>
+            <div class="form-group">
+              <label for="sb-submit-sel">Selector Nút Lưu:</label>
+              <input type="text" id="sb-submit-sel" value="#sandbox-submit-btn" />
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
+            <button type="button" id="sb-btn-quick" class="btn btn-success" style="flex: 1;">
+              ⚡ Đăng Ký Nhanh
+            </button>
+            <label style="display: inline-flex; align-items: center; gap: 4px; margin: 0; cursor: pointer;">
+              <input type="checkbox" id="sb-chk-autosubmit" checked />
+              <span>Tự bấm Lưu</span>
+            </label>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <button type="button" id="sb-btn-auto" class="btn btn-primary" style="flex: 1;">
+              🔄 Bật Auto Canh Slot
+            </button>
+            <span style="font-size: 12.5px;">mỗi</span>
+            <input type="number" id="sb-inp-interval" value="2" min="1" step="0.5" style="width: 56px; text-align: center;" />
+            <span style="font-size: 12.5px;">giây</span>
+          </div>
+
+          <div>
+            <label>Nhật ký thực thi (Real-time Log):</label>
+            <div
+              id="sb-status-log"
+              style="background: #0f172a; color: #86efac; font-family: Consolas, monospace; font-size: 11.5px; padding: 10px; border-radius: 6px; min-height: 110px; max-height: 160px; overflow-y: auto; white-space: pre-line;"
+            >Sẵn sàng! Bạn có thể bấm "Đăng Ký Nhanh" hoặc chuyển đổi giữa 3 cổng trường giả lập.</div>
+          </div>
+        </div>
+
+        <!-- Right: Simulated University Portal DOM -->
+        <div class="card" id="sandbox-portal-viewport">
+          <!-- Rendered dynamically by app.js based on selected university portal -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

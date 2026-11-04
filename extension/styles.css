@@ -1,0 +1,192 @@
+/* Giao diện UniReg Pro — Universal Multi-University Extension v2.0 */
+#autodkmh-panel {
+  background: #ffffff;
+  border: 1.5px solid #2563eb;
+  border-radius: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 12.5px;
+  color: #0f172a;
+  box-sizing: border-box;
+  width: 100%;
+  box-shadow: 0 6px 24px rgba(15, 23, 42, 0.14);
+  overflow: hidden;
+}
+
+#autodkmh-panel * {
+  box-sizing: border-box;
+}
+
+.autodkmh-header {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13.5px;
+  padding: 9px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.autodkmh-minimize-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #fff;
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.autodkmh-body {
+  padding: 10px;
+}
+
+.autodkmh-field-label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 3px;
+}
+
+#autodkmh-preset-select {
+  width: 100%;
+  padding: 5px 7px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-bottom: 8px;
+  background: #f8fafc;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+#autodkmh-input {
+  width: 100%;
+  min-height: 82px;
+  padding: 6px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.45;
+  resize: vertical;
+  background-color: #fff;
+  color: #0f172a;
+}
+
+#autodkmh-input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.autodkmh-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 7px;
+  flex-wrap: wrap;
+}
+
+.autodkmh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.autodkmh-btn:hover {
+  opacity: 0.92;
+}
+
+.autodkmh-btn-quick {
+  background-color: #16a34a;
+  flex: 1;
+}
+
+.autodkmh-btn-auto {
+  background-color: #2563eb;
+  flex: 1;
+}
+
+.autodkmh-btn-auto.is-running {
+  background-color: #dc2626;
+}
+
+.autodkmh-btn-picker {
+  background-color: #f1f5f9;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+  font-size: 11.5px;
+  padding: 5px 8px;
+  flex: 1;
+}
+
+.autodkmh-btn-picker:hover {
+  background-color: #e2e8f0;
+}
+
+.autodkmh-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+#autodkmh-interval {
+  width: 48px;
+  padding: 4px 5px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.autodkmh-result-box {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px dashed #cbd5e1;
+}
+
+.autodkmh-result-title {
+  font-weight: 700;
+  font-size: 11.5px;
+  margin-bottom: 4px;
+}
+
+#autodkmh-status {
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: #86efac;
+  background: #0f172a;
+  border-radius: 4px;
+  padding: 6px 8px;
+  max-height: 115px;
+  overflow-y: auto;
+  white-space: pre-line;
+  font-family: Consolas, Monaco, monospace;
+}
+
+.autodkmh-rowindex-badge {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1e3a8a;
+  text-align: center;
+}
+
+.unireg-picker-hover {
+  outline: 3px solid #f59e0b !important;
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  cursor: crosshair !important;
+}
