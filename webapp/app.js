@@ -460,14 +460,47 @@
 
   let timerId = null;
   let cycle = 0;
+  let isBusy = false;
   let pickerMode = null;
 
   const norm = (s) => String(s || "").replace(/\\s+/g, " ").trim().toUpperCase();
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  function getDocs() {
+    const docs = [document];
+    document.querySelectorAll("iframe, frame").forEach((f) => {
+      try { if (f.contentDocument) docs.push(f.contentDocument); } catch {}
+    });
+    return docs;
+  }
+
+  function qAll(sel) {
+    if (!sel) return [];
+    const res = [];
+    getDocs().forEach((d) => { try { res.push(...d.querySelectorAll(sel)); } catch {} });
+    return res;
+  }
+
+  function qOne(sel) {
+    if (!sel) return null;
+    for (const d of getDocs()) {
+      try { const el = d.querySelector(sel); if (el) return el; } catch {}
+    }
+    return null;
+  }
+
+  function setNativeValue(el, val) {
+    const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set;
+    if (setter) setter.call(el, val); else el.value = val;
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+    el.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", code: "Enter", keyCode: 13, which: 13, bubbles: true }));
+  }
 
   function buildUniqueSelector(el) {
     if (!el || el.nodeType !== 1) return "";
     if (el.id) return "#" + CSS.escape(el.id);
-    if (el.tagName === "INPUT" && el.type === "checkbox") return "input[type='checkbox']";
+    if (el.tagName === "INPUT" && (el.type === "checkbox" || el.type === "radio")) return "input[type='" + el.type + "']";
     const classes = Array.from(el.classList).filter((c) => !c.startsWith("unireg-"));
     if (classes.length > 0) {
       return el.tagName.toLowerCase() + "." + classes.map((c) => CSS.escape(c)).join(".");
@@ -477,7 +510,7 @@
 
   const widget = document.createElement("div");
   widget.id = "unireg-universal-widget";
-  widget.style.cssText = "position:fixed;bottom:16px;left:16px;width:300px;background:#fff;border:2px solid #2563eb;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,0.22);z-index:2147483647;font-family:Arial,sans-serif;font-size:12.5px;color:#0f172a;overflow:hidden;";
+  widget.style.cssText = "position:fixed;bottom:16px;left:16px;width:305px;background:#fff;border:2px solid #2563eb;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,0.22);z-index:2147483647;font-family:Arial,sans-serif;font-size:12.5px;color:#0f172a;overflow:hidden;";
   widget.innerHTML = \`
     <div style="background:#1e3a8a;color:#fff;padding:9px 12px;font-weight:700;display:flex;justify-content:space-between;align-items:center;">
       <span>🎓 UniReg Auto (\${INITIAL_CONFIG.profile.name})</span>
@@ -486,9 +519,10 @@
     <div style="padding:10px;">
       <label style="font-weight:600;display:block;margin-bottom:4px;">Danh sách mã lớp / mã ẩn (mỗi dòng 1 mã):</label>
       <textarea id="unireg-codes" rows="4" style="width:100%;box-sizing:border-box;padding:6px;border:1px solid #cbd5e1;border-radius:4px;font-size:12px;"></textarea>
-      <div style="display:flex;gap:6px;margin-top:6px;">
-        <button id="unireg-pick-action" style="flex:1;padding:5px;font-size:11.5px;cursor:pointer;border:1px solid #cbd5e1;background:#f8fafc;border-radius:4px;">🎯 Chọn Ô/Nút ĐK</button>
-        <button id="unireg-pick-submit" style="flex:1;padding:5px;font-size:11.5px;cursor:pointer;border:1px solid #cbd5e1;background:#f8fafc;border-radius:4px;">🎯 Chọn Nút Lưu</button>
+      <div style="display:flex;gap:5px;margin-top:6px;">
+        <button id="unireg-pick-search" style="flex:1;padding:5px;font-size:11px;cursor:pointer;border:1px solid #cbd5e1;background:#f8fafc;border-radius:4px;">🎯 Ô Tìm</button>
+        <button id="unireg-pick-action" style="flex:1;padding:5px;font-size:11px;cursor:pointer;border:1px solid #cbd5e1;background:#f8fafc;border-radius:4px;">🎯 Ô/Nút ĐK</button>
+        <button id="unireg-pick-submit" style="flex:1;padding:5px;font-size:11px;cursor:pointer;border:1px solid #cbd5e1;background:#f8fafc;border-radius:4px;">🎯 Nút Lưu</button>
       </div>
       <div style="display:flex;gap:6px;margin-top:8px;align-items:center;">
         <button id="unireg-btn-now" style="flex:1;background:#16a34a;color:#fff;border:none;padding:7px 10px;border-radius:4px;font-weight:700;cursor:pointer;">⚡ ĐK Nhanh</button>
@@ -500,7 +534,7 @@
         <input type="number" id="unireg-interval" value="\${INITIAL_CONFIG.profile.interval || 2.5}" min="1" step="0.5" style="width:46px;padding:4px;text-align:center;border:1px solid #cbd5e1;border-radius:4px;" />
         <span>s</span>
       </div>
-      <div id="unireg-log" style="margin-top:8px;background:#0f172a;color:#86efac;padding:7px;border-radius:4px;font-family:monospace;font-size:11px;max-height:110px;overflow-y:auto;white-space:pre-line;">Sẵn sàng trên trang hiện tại!</div>
+      <div id="unireg-log" style="margin-top:8px;background:#0f172a;color:#86efac;padding:7px;border-radius:4px;font-family:monospace;font-size:11px;max-height:110px;overflow-y:auto;white-space:pre-line;">Sẵn sàng trên trang cổng trường hiện tại!</div>
     </div>
   \`;
   document.body.appendChild(widget);
@@ -510,6 +544,7 @@
   codesEl.value = (INITIAL_CONFIG.codes || []).join("\\n");
   document.getElementById("unireg-autosubmit").checked = INITIAL_CONFIG.profile.autoSubmit !== false;
 
+  let searchSel = INITIAL_CONFIG.profile.searchSelector || "";
   let actionSel = INITIAL_CONFIG.profile.actionSelector || "input[type='checkbox']";
   let submitSel = INITIAL_CONFIG.profile.submitSelector || "#btnGhiNhan, #btnLuu, #btnDangKy";
 
@@ -517,54 +552,71 @@
     logEl.textContent = ["[" + new Date().toLocaleTimeString("vi-VN") + "]", ...lines].join("\\n");
   }
 
-  function runPass(label) {
-    const targets = codesEl.value.split(/\\r?\\n/).map(norm).filter(Boolean);
-    if (!targets.length) return log(["Vui lòng nhập ít nhất 1 mã lớp học phần!"]);
-    const rows = Array.from(document.querySelectorAll(INITIAL_CONFIG.profile.rowSelector || "table tbody tr"));
-    const out = ["Nguồn: " + label];
-    let hit = 0;
+  async function runPass(label) {
+    if (isBusy) return;
+    isBusy = true;
+    try {
+      const targets = codesEl.value.split(/\\r?\\n/).map((l) => norm(l.split("|")[0])).filter(Boolean);
+      if (!targets.length) return log(["Vui lòng nhập ít nhất 1 mã lớp học phần!"]);
+      const out = ["Nguồn: " + label];
+      let hit = 0;
+      const searchBox = searchSel ? qOne(searchSel) : null;
 
-    targets.forEach((code) => {
-      const row = rows.find((tr) => {
-        const cb = tr.querySelector("input[type='checkbox'][data-rowindex]");
-        if (cb && norm(cb.getAttribute("data-rowindex")) === code) return true;
-        return norm(tr.textContent).includes(code);
-      });
-      if (!row) {
-        out.push("- [" + code + "]: Không tìm thấy dòng môn học.");
-        return;
-      }
-      const act = row.querySelector(actionSel) || row.querySelector("input[type='checkbox'], input[type='radio'], button");
-      if (!act || act.disabled) {
-        out.push("- [" + code + "]: Ô/nút chọn đang bị khóa.");
-        return;
-      }
-      hit++;
-      if (act.type === "checkbox" || act.type === "radio") {
-        if (!act.checked) {
-          act.click();
-          if (!act.checked) {
-            act.checked = true;
-            act.dispatchEvent(new Event("change", { bubbles: true }));
-          }
-          out.push("+ [" + code + "]: Đã tick chọn thành công!");
-        } else {
-          out.push("= [" + code + "]: Đã được tick sẵn.");
+      for (const code of targets) {
+        if (searchBox) {
+          setNativeValue(searchBox, code);
+          await sleep(320);
         }
-      } else {
-        act.click();
-        out.push("+ [" + code + "]: Đã bấm nút chọn môn!");
+        const rows = qAll(INITIAL_CONFIG.profile.rowSelector || "table tbody tr").filter((tr) => !widget.contains(tr));
+        const row = rows.find((tr) => {
+          const cb = tr.querySelector("input[type='checkbox'][data-rowindex]");
+          if (cb && norm(cb.getAttribute("data-rowindex")) === code) return true;
+          return norm(tr.textContent).includes(code);
+        });
+        if (!row) {
+          out.push("- [" + code + "]: Không tìm thấy dòng môn học.");
+          continue;
+        }
+        const act = row.querySelector(actionSel) || row.querySelector("input[type='checkbox'], input[type='radio'], button, a.btn");
+        if (!act || act.disabled) {
+          out.push("- [" + code + "]: Ô/nút chọn đang bị khóa.");
+          continue;
+        }
+        hit++;
+        if (act.type === "checkbox" || act.type === "radio") {
+          if (!act.checked) {
+            act.click();
+            if (!act.checked) {
+              act.checked = true;
+              act.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+            out.push("+ [" + code + "]: Đã tick chọn thành công!");
+          } else {
+            out.push("= [" + code + "]: Đã được tick sẵn.");
+          }
+        } else {
+          act.click();
+          out.push("+ [" + code + "]: Đã bấm nút chọn môn!");
+        }
       }
-    });
 
-    if (hit > 0 && document.getElementById("unireg-autosubmit").checked) {
-      const sub = document.querySelector(submitSel);
-      if (sub && !sub.disabled) {
-        sub.click();
-        out.push("=> Đã bấm nút Lưu / Ghi nhận!");
+      if (hit > 0 && document.getElementById("unireg-autosubmit").checked) {
+        const sub = qOne(submitSel);
+        if (sub && !sub.disabled) {
+          sub.click();
+          out.push("=> Đã bấm nút Lưu / Ghi nhận!");
+          await sleep(250);
+          const modalBtn = qOne(".swal2-confirm, .bootbox-accept, .modal.show .btn-primary, .ui-dialog-buttonset button:first-child");
+          if (modalBtn && !modalBtn.disabled) {
+            modalBtn.click();
+            out.push("=> Đã tự động xác nhận Popup!");
+          }
+        }
       }
+      log(out);
+    } finally {
+      isBusy = false;
     }
-    log(out);
   }
 
   document.getElementById("unireg-btn-now").onclick = () => runPass("Đăng Ký Nhanh");
@@ -587,29 +639,42 @@
     }, sec * 1000);
   };
 
+  function bindPicker() {
+    getDocs().forEach((d) => {
+      if (d._uniregBound) return;
+      d._uniregBound = true;
+      d.addEventListener("click", (e) => {
+        if (!pickerMode || widget.contains(e.target)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const sel = buildUniqueSelector(e.target);
+        if (pickerMode === "search") {
+          searchSel = sel;
+          log(["✅ Đã học Ô tìm kiếm môn: " + sel]);
+        } else if (pickerMode === "action") {
+          actionSel = sel;
+          log(["✅ Đã học Ô/Nút chọn môn: " + sel]);
+        } else {
+          submitSel = sel;
+          log(["✅ Đã học Nút Lưu/Ghi nhận: " + sel]);
+        }
+        pickerMode = null;
+      }, true);
+    });
+  }
+
+  document.getElementById("unireg-pick-search").onclick = () => {
+    pickerMode = "search"; bindPicker();
+    log(["🎯 Hãy click vào Ô Tìm kiếm / Lọc môn trên trang trường!"]);
+  };
   document.getElementById("unireg-pick-action").onclick = () => {
-    pickerMode = "action";
+    pickerMode = "action"; bindPicker();
     log(["🎯 Hãy click vào Ô tick hoặc Nút đăng ký của 1 môn bất kỳ trên trang!"]);
   };
   document.getElementById("unireg-pick-submit").onclick = () => {
-    pickerMode = "submit";
+    pickerMode = "submit"; bindPicker();
     log(["🎯 Hãy click vào Nút Lưu / Ghi nhận đăng ký trên trang!"]);
   };
-
-  document.addEventListener("click", (e) => {
-    if (!pickerMode || widget.contains(e.target)) return;
-    e.preventDefault();
-    e.stopPropagation();
-    const sel = buildUniqueSelector(e.target);
-    if (pickerMode === "action") {
-      actionSel = sel;
-      log(["✅ Đã học Ô/Nút chọn môn: " + sel]);
-    } else {
-      submitSel = sel;
-      log(["✅ Đã học Nút Lưu/Ghi nhận: " + sel]);
-    }
-    pickerMode = null;
-  }, true);
 
   document.getElementById("unireg-close").onclick = () => {
     widget.style.display = "none";

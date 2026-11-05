@@ -1,14 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "UniReg Pro — Auto Đăng Ký Học Phần Đa Trường",
-  "version": "2.0.0",
-  "description": "Tiện ích hỗ trợ đăng ký học phần cho mọi trường ĐH/CĐ: Tự nhận diện cổng trường, Click chọn phần tử (Visual Picker) và Auto Canh Slot.",
+  "name": "UniReg Pro — Auto Đăng Ký Học Phần Đa Trường (Real DOM Engine)",
+  "version": "2.1.0",
+  "description": "Tiện ích thực thi đăng ký học phần trực tiếp trên cổng ĐKMH thật của mọi trường ĐH/CĐ (hỗ trợ Iframe, React/Angular/Vue, Search Box & Auto Canh Slot).",
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
       "css": ["styles.css"],
       "js": ["content.js"],
-      "run_at": "document_idle"
+      "run_at": "document_idle",
+      "all_frames": false
     }
   ],
   "permissions": ["storage"]
